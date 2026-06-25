@@ -1,0 +1,107 @@
+dataset: lh_hub_finance_silver/silver/ods_account
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# NOTE: DESCRIBE was truncated at 20 rows; columns beyond that are not covered.
+#       Run: spark.sql("DESCRIBE TABLE lh_hub_finance_silver.silver.ods_account").toPandas().to_string()
+#       and add the remaining columns below.
+# --------------------------------------------------------------------------- #
+columns:
+  - name: pk_ods_account
+    data_type: string
+    checks:
+      - type: missing
+        name: pk_ods_account must not be null
+
+  - name: fk_currency
+    data_type: string
+
+  - name: fk_entity
+    data_type: string
+
+  - name: account_key
+    data_type: string
+
+  - name: account_reference
+    data_type: string
+    checks:
+      - type: missing
+        name: account_reference must not be null
+
+  - name: data_date
+    data_type: timestamp
+
+  - name: category
+    data_type: string
+    checks:
+      - type: missing
+        name: category must not be null
+
+  - name: category_description
+    data_type: string
+
+  - name: currency
+    data_type: string
+    checks:
+      - type: missing
+        name: currency must not be null
+
+  - name: balance
+    data_type: decimal
+    checks:
+      - type: missing
+        name: balance must not be null
+
+  - name: first_balance_date
+    data_type: timestamp
+
+  - name: opening_date
+    data_type: timestamp
+
+  - name: account_short_title
+    data_type: string
+
+  - name: interest_basis
+    data_type: string
+
+  - name: interest_rate
+    data_type: decimal
+    checks:
+      - type: missing
+        name: interest_rate must not be null
+
+  - name: interest_type
+    data_type: string
+
+  - name: entity_id
+    data_type: string
+
+  - name: write_date
+    data_type: timestamp
+
+  - name: third_party_ref
+    data_type: string
+
+  - name: interest_spread
+    data_type: decimal
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    # allow_extra_columns: true because DESCRIBE was truncated at 20 rows
+    allow_extra_columns: true
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: pk_ods_account must be unique
+    columns:
+      - pk_ods_account

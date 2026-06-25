@@ -1,0 +1,60 @@
+dataset: lh_hub_finance_silver/silver/lu_cash_flow_security_trade
+
+# Dataset-level SQL filter applied before every check.
+# ${FILTER_START_TIME} is resolved from the variables block below (or from
+# the caller's variables dict / an OS environment variable at runtime).
+# filter: "created > '${FILTER_START_TIME}'"
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Runtime variables (caller overrides take precedence over these defaults)
+# --------------------------------------------------------------------------- #
+# variables:
+#   FILTER_START_TIME:
+#     default: "2024-01-01 00:00:00"
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# --------------------------------------------------------------------------- #
+columns:
+  - name: contract_currency
+    data_type: string
+    checks:
+      - type: missing
+        name: must not be null
+
+      - type: invalid
+        name: must be a EUR currency code
+        valid_values: [ "EUR" ]
+        threshold: 
+          metric: percent
+          must_be_less_than: 5
+        
+  # - name: data_date
+  #   data_type: timestamp
+  #   checks:
+  #     - type: invalid
+  #       name: must be datetime
+
+  # - name: transaction_reference
+  #   data_type: string
+  #   checks:
+  #     - type: duplicate
+  #       name: must not contain duplicates
+  #       on_fail:
+  #         action: quarantine
+
+  # - name: status
+  #   data_type: string
+  #   checks:
+  #     - type: failed_rows
+  #       name: check column length
+  #       expression: "length(status) = 3"
+  #       threshold:
+  #         metric: count
+  #         must_be_less_than: 1
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #

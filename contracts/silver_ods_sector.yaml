@@ -1,0 +1,91 @@
+dataset: lh_hub_finance_silver/silver/ods_sector
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# --------------------------------------------------------------------------- #
+columns:
+  - name: pk_ods_sector
+    data_type: string
+    checks:
+      - type: missing
+        name: pk_ods_sector must not be null
+
+  - name: sector_key
+    data_type: string
+    checks:
+      - type: missing
+        name: sector_key must not be null
+
+  - name: sector_reference
+    data_type: string
+    checks:
+      - type: missing
+        name: sector_reference must not be null
+
+  - name: sector_desc
+    data_type: string
+    checks:
+      - type: missing
+        name: sector_desc must not be null
+
+  - name: data_date
+    data_type: timestamp
+
+  - name: short_name
+    data_type: string
+
+  - name: write_date
+    data_type: timestamp
+
+  - name: ctr_file_name
+    data_type: string
+
+  - name: ctr_ins_date
+    data_type: timestamp
+
+  - name: ctr_username
+    data_type: string
+
+  - name: ctr_notebook
+    data_type: string
+
+  - name: ctr_hash_validate
+    data_type: string
+
+  # TODO: replace placeholder with the full column name (truncated in DESCRIBE output as 'ctr_last_operatio...')
+  # - name: ctr_last_operation_date
+  #   data_type: timestamp
+
+  - name: ctr_action
+    data_type: string
+
+  - name: ctr_is_deleted
+    data_type: integer
+    checks:
+      - type: invalid
+        name: ctr_is_deleted must be 0 or 1
+        valid_values: [0, 1]
+
+  - name: ctr_hash_key
+    data_type: string
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    # allow_extra_columns: true because one ctr_ column name was truncated in DESCRIBE output
+    allow_extra_columns: true
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: pk_ods_sector must be unique
+    columns:
+      - pk_ods_sector

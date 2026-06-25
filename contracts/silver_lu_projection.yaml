@@ -1,0 +1,74 @@
+dataset: lh_hub_finance_silver/silver/lu_projection
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# --------------------------------------------------------------------------- #
+columns:
+  - name: contract_type
+    data_type: string
+    checks:
+      - type: missing
+        name: contract_type must not be null
+
+  - name: proj_num
+    data_type: integer
+    checks:
+      - type: missing
+        name: proj_num must not be null
+
+  - name: duration_type
+    data_type: string
+    checks:
+      - type: missing
+        name: duration_type must not be null
+
+  - name: duration
+    data_type: integer
+    checks:
+      - type: missing
+        name: duration must not be null
+
+  - name: write_date
+    data_type: timestamp
+
+  - name: proj_type
+    data_type: string
+    checks:
+      - type: missing
+        name: proj_type must not be null
+
+  - name: ctr_file_name
+    data_type: string
+
+  - name: ctr_ins_date
+    data_type: timestamp
+
+  - name: ctr_username
+    data_type: string
+
+  - name: ctr_notebook
+    data_type: string
+
+  - name: ctr_hash_validate
+    data_type: string
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    allow_extra_columns: false
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: The combination of contract_type + proj_num must be unique
+    columns:
+      - contract_type
+      - proj_num

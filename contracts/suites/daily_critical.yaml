@@ -1,0 +1,6 @@
+name: daily_critical
+description: "Critical tables validated before morning reports"
+on_missing_contract: fail   # any missing contract blocks the pipeline
+contracts:
+  - silver_lu_cash_flow_security_trade.yaml
+  - bronze_lu_account_condition_alm.yaml

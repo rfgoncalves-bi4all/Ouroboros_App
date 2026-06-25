@@ -1,0 +1,5 @@
+name: smoke
+description: "Lightweight sanity check — runs only the most critical table"
+on_missing_contract: warn   # skip and log if a contract file is absent
+contracts:
+  - dim_customer.yaml

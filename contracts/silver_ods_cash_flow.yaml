@@ -1,0 +1,111 @@
+dataset: lh_hub_finance_silver/silver/ods_cash_flow
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# NOTE: DESCRIBE was truncated at 20 rows; columns beyond that are not covered.
+#       Run: spark.sql("DESCRIBE TABLE lh_hub_finance_silver.silver.ods_cash_flow").toPandas().to_string()
+#       and add the remaining columns below.
+# --------------------------------------------------------------------------- #
+columns:
+  - name: pk_ods_cash_flow
+    data_type: string
+    checks:
+      - type: missing
+        name: pk_ods_cash_flow must not be null
+
+  # TODO: replace placeholder with the full column name (truncated in DESCRIBE output as 'fk_contract_refer...')
+  # - name: fk_contract_reference
+  #   data_type: string
+
+  - name: contract_key
+    data_type: string
+
+  - name: contract_reference
+    data_type: string
+    checks:
+      - type: missing
+        name: contract_reference must not be null
+
+  - name: data_date
+    data_type: timestamp
+
+  - name: idq_contract_type
+    data_type: string
+
+  - name: cash_flow_type
+    data_type: string
+    checks:
+      - type: missing
+        name: cash_flow_type must not be null
+
+  - name: cash_flow_date
+    data_type: timestamp
+
+  - name: asset_liab
+    data_type: string
+
+  - name: cash_flow_quality
+    data_type: string
+
+  - name: status
+    data_type: string
+    checks:
+      - type: missing
+        name: status must not be null
+
+  - name: contract_currency
+    data_type: string
+    checks:
+      - type: missing
+        name: contract_currency must not be null
+
+  - name: amount_lcy
+    data_type: decimal
+    checks:
+      - type: missing
+        name: amount_lcy must not be null
+
+  - name: amount_fcy
+    data_type: decimal
+    checks:
+      - type: missing
+        name: amount_fcy must not be null
+
+  - name: outstanding_lcy
+    data_type: decimal
+
+  - name: outstanding_fcy
+    data_type: decimal
+
+  - name: write_date
+    data_type: timestamp
+
+  - name: cash_flow_calc_date
+    data_type: timestamp
+
+  - name: ctr_file_name
+    data_type: string
+
+  - name: ctr_ins_date
+    data_type: timestamp
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    # allow_extra_columns: true because DESCRIBE was truncated at 20 rows and one FK column name was truncated
+    allow_extra_columns: true
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: pk_ods_cash_flow must be unique
+    columns:
+      - pk_ods_cash_flow

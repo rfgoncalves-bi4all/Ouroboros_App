@@ -1,0 +1,126 @@
+dataset: dim_customer
+
+# Dataset-level SQL filter applied before every check.
+# ${FILTER_START_TIME} is resolved from the variables block below (or from
+# the caller's variables dict / an OS environment variable at runtime).
+filter: "created > '${FILTER_START_TIME}'"
+
+owner: zaynabissa@company.com
+
+# --------------------------------------------------------------------------- #
+# Runtime variables (caller overrides take precedence over these defaults)
+# --------------------------------------------------------------------------- #
+variables:
+  FILTER_START_TIME:
+    default: "2024-01-01 00:00:00"
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# --------------------------------------------------------------------------- #
+columns:
+  - name: last_name
+    data_type: string
+    checks:
+      - type: missing
+        name: last_name must not be null
+
+      - type: duplicate
+        name: last_name must be unique
+
+      - type: invalid
+        name: last_name must look like a proper last name
+        valid_format:
+          name: Proper last name format
+          regex: '^[A-Z][a-zA-Z\s\-'']+$'
+
+  - name: total_children
+    data_type: integer
+    checks:
+      - type: aggregate
+        name: Average number of children must be realistic
+        function: avg
+        threshold:
+          must_be_between:
+            greater_than_or_equal: 0
+            less_than_or_equal: 10
+
+  - name: country_id
+    checks:
+      - type: invalid
+        name: country_id must exist in the COUNTRIES reference table
+        valid_values_column:
+          dataset: COUNTRIES
+          column: id
+        threshold:
+          metric: percent
+          must_be_less_than: 5   # at most 5 % of rows may have an unknown country_id
+
+  - name: date_first_purchase
+    checks:
+      - type: freshness
+        name: date_first_purchase must be no older than 6 hours
+        unit: hour
+        threshold:
+          must_be_less_than: 6
+
+  - name: email
+    data_type: string
+    checks:
+      - type: missing
+        name: email must not be null
+
+      - type: invalid
+        name: email must be a valid email address
+        valid_format:
+          name: Email format
+          regex: '^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
+
+  - name: phone
+    data_type: string
+    checks:
+      - type: missing
+        name: At most 10 % of phone numbers may be null
+        threshold:
+          metric: percent
+          must_be_less_than: 10
+
+  - name: status
+    data_type: string
+    checks:
+      - type: invalid
+        name: status must be one of the allowed codes
+        valid_values: ['A', 'I', 'P']
+
+      - type: failed_rows
+        name: Inactive customers must have a deactivation_date
+        expression: "status = 'I' AND deactivation_date IS NULL"
+        threshold:
+          must_be_less_than: 1   # zero tolerance
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    allow_extra_columns: false
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: The combination of phone + email must be unique
+    columns:
+      - phone
+      - email
+
+  - type: metric
+    name: Average account age (days) must be between 30 and 3650
+    expression: "AVG(DATEDIFF(CURRENT_DATE, created_date))"
+    threshold:
+      must_be_between:
+        greater_than_or_equal: 30
+        less_than: 3650
+

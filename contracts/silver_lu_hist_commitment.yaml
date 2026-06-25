@@ -1,0 +1,95 @@
+dataset: lh_hub_finance_silver/silver/lu_hist_commitment
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# --------------------------------------------------------------------------- #
+columns:
+  - name: third_party_ref
+    data_type: string
+    checks:
+      - type: missing
+        name: third_party_ref must not be null
+
+  - name: data_date
+    data_type: timestamp
+
+  - name: contract_reference
+    data_type: string
+    checks:
+      - type: missing
+        name: contract_reference must not be null
+
+  - name: entity_id
+    data_type: integer
+    checks:
+      - type: missing
+        name: entity_id must not be null
+
+  - name: currency
+    data_type: string
+    checks:
+      - type: missing
+        name: currency must not be null
+
+  - name: value_date
+    data_type: timestamp
+
+  - name: maturity_date
+    data_type: timestamp
+
+  # TODO: replace placeholder with the full column name (truncated in DESCRIBE output as 'initial_amount_fp...')
+  # - name: initial_amount_fp<suffix>
+  #   data_type: decimal
+
+  - name: initial_amount
+    data_type: decimal
+    checks:
+      - type: missing
+        name: initial_amount must not be null
+
+  - name: is_t24_data_recovery
+    data_type: string
+    checks:
+      - type: missing
+        name: is_t24_data_recovery must not be null
+
+  - name: write_date
+    data_type: timestamp
+
+  - name: ctr_file_name
+    data_type: string
+
+  - name: ctr_ins_date
+    data_type: timestamp
+
+  - name: ctr_username
+    data_type: string
+
+  - name: ctr_notebook
+    data_type: string
+
+  - name: ctr_hash_validate
+    data_type: string
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    # allow_extra_columns: true because one column name was truncated in DESCRIBE output
+    allow_extra_columns: true
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: third_party_ref + contract_reference + data_date must be unique
+    columns:
+      - third_party_ref
+      - contract_reference
+      - data_date

@@ -1,0 +1,109 @@
+dataset: lh_hub_finance_silver/silver/ods_loans_and_deposits
+
+owner: manuel.martins@coebank.org
+
+# --------------------------------------------------------------------------- #
+# Column contracts
+# NOTE: DESCRIBE was truncated at 20 rows; columns beyond that are not covered.
+#       Run: spark.sql("DESCRIBE TABLE lh_hub_finance_silver.silver.ods_loans_and_deposits").toPandas().to_string()
+#       and add the remaining columns below.
+# NOTE: PK column was truncated in DESCRIBE output as 'pk_ods_loans_and_...'.
+#       Full name assumed to be 'pk_ods_loans_and_deposits' — verify and update if needed.
+# --------------------------------------------------------------------------- #
+columns:
+  - name: pk_ods_loans_and_deposits
+    data_type: string
+    checks:
+      - type: missing
+        name: pk_ods_loans_and_deposits must not be null
+
+  - name: fk_entity
+    data_type: string
+
+  - name: fk_currency
+    data_type: string
+
+  - name: contract_key
+    data_type: string
+
+  - name: contract_reference
+    data_type: string
+    checks:
+      - type: missing
+        name: contract_reference must not be null
+
+  - name: data_date
+    data_type: timestamp
+
+  - name: contract_status
+    data_type: string
+    checks:
+      - type: missing
+        name: contract_status must not be null
+
+  - name: category
+    data_type: string
+
+  - name: category_description
+    data_type: string
+
+  - name: currency
+    data_type: string
+    checks:
+      - type: missing
+        name: currency must not be null
+
+  - name: nominal
+    data_type: decimal
+    checks:
+      - type: missing
+        name: nominal must not be null
+
+  - name: outstanding
+    data_type: decimal
+    checks:
+      - type: missing
+        name: outstanding must not be null
+
+  - name: deal_date
+    data_type: timestamp
+
+  - name: value_date
+    data_type: timestamp
+
+  - name: maturity_date
+    data_type: timestamp
+
+  - name: interest_basis
+    data_type: string
+
+  - name: interest_rate
+    data_type: decimal
+
+  - name: interest_type
+    data_type: string
+
+  - name: accruals
+    data_type: decimal
+
+  - name: entity_id
+    data_type: string
+
+# --------------------------------------------------------------------------- #
+# Table-level checks
+# --------------------------------------------------------------------------- #
+checks:
+  - type: schema
+    name: All declared columns must exist
+    # allow_extra_columns: true because DESCRIBE was truncated at 20 rows and PK name was truncated
+    allow_extra_columns: true
+
+  - type: row_count
+    name: Table must not be empty
+    threshold:
+      must_be_greater_than_or_equal: 1
+
+  - type: duplicate
+    name: pk_ods_loans_and_deposits must be unique
+    columns:
+      - pk_ods_loans_and_deposits

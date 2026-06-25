@@ -1,0 +1,7 @@
+name: full
+description: "Complete validation of every table in the project"
+on_missing_contract: warn   # skip unknown tables rather than blocking the full run
+contracts:
+  - dim_customer.yaml
+  - dim_product.yaml
+  - fact_sales.yaml

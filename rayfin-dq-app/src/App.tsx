@@ -19,6 +19,7 @@ import {
   useEditsByRunId,
 } from "./hooks/useQuarantineState";
 import { useFabricClients } from "./hooks/useFabricClients";
+import { useFabricAuth } from "./hooks/useFabricAuth";
 import type { QuarantineTableInfo } from "./services/quarantineService";
 
 // ---------------------------------------------------------------------------
@@ -119,6 +120,45 @@ function TriageView() {
 // Root
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Auth guard
+// ---------------------------------------------------------------------------
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useFabricAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3" />
+          <p className="text-sm text-gray-500">Connecting to Fabric...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-100">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 max-w-sm w-full text-center">
+          <h1 className="font-semibold text-gray-900 text-lg mb-1">Data Quality Triage</h1>
+          <p className="text-sm text-gray-500 mb-6">
+            Open this app from the Microsoft Fabric portal to sign in automatically,
+            or start the Rayfin dev server locally.
+          </p>
+          <p className="text-xs text-gray-400">
+            If you are already signed in and see this screen, the Fabric session
+            may have expired. Reload the page to retry.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 function AppInner() {
   const [tab, setTab] = useState<Tab>("triage");
 
@@ -167,7 +207,9 @@ function AppInner() {
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppInner />
+      <AuthGuard>
+        <AppInner />
+      </AuthGuard>
     </QueryClientProvider>
   );
 }

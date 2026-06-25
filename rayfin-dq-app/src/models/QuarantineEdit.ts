@@ -34,8 +34,14 @@ export enum EditStatus {
 // ---------------------------------------------------------------------------
 
 @entity({ name: "QuarantineEdit", description: "Staged data-edit intent for a quarantined row" })
-@role("member", { read: true, write: true })
-@role("viewer", { read: true, write: false })
+// Viewers: read-only access to all edit records.
+@role("viewer", ["read"])
+// Members: read all records, create new edit intents.
+@role("member", ["read", "create"])
+// Members: update/delete only their own staged edits (row-level ownership).
+// The policy DSL is compiled server-side by the Rayfin CLI.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+@role("member", ["update", "delete"], { policy: (claims: any, item: any) => claims.sub.eq(item.edited_by) })
 export class QuarantineEdit {
   /** Auto-generated primary key. */
   @field({ type: "uuid", primaryKey: true, auto: true })

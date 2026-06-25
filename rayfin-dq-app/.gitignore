@@ -1,0 +1,30 @@
+# Environment — never commit real secrets
+.env
+.env.local
+.env.*.local
+# Deployment-generated env files written by `rayfin up`
+.env.fabric
+.env.fabric-*
+
+# Build output
+dist/
+dist-ssr/
+
+# Dependencies
+node_modules/
+
+# Rayfin generated artifacts
+rayfin/.temp/
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db

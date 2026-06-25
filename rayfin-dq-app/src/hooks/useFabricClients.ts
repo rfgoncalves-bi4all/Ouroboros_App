@@ -5,7 +5,7 @@
  * the Rayfin auth context. All clients use user-passthrough Bearer tokens.
  */
 import { useMemo } from "react";
-import { useAuth } from "@rayfin/sdk";
+import { useFabricAuth } from "./useFabricAuth";
 import { GraphQLClient } from "graphql-request";
 import { FabricSqlClient } from "../services/fabricSqlClient";
 import { createRayfinClient } from "../services/rayfinClient";
@@ -20,7 +20,7 @@ export interface FabricClients {
 }
 
 export function useFabricClients(): FabricClients {
-  const { accessToken } = useAuth();
+  const { accessToken } = useFabricAuth();
 
   return useMemo(() => {
     const projectEndpoint = import.meta.env.VITE_FABRIC_SQL_ENDPOINT_URL ?? "";

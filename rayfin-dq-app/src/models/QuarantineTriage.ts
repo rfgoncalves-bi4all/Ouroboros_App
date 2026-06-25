@@ -25,8 +25,14 @@ export enum TriageDecision {
 // ---------------------------------------------------------------------------
 
 @entity({ name: "QuarantineTriage", description: "Triage decision for a quarantined row" })
-@role("member", { read: true, write: true })
-@role("viewer", { read: true, write: false })
+// Viewers: read-only access to all triage records.
+@role("viewer", ["read"])
+// Members: read all records, create new ones.
+@role("member", ["read", "create"])
+// Members: update/delete only their own decisions (row-level ownership).
+// The policy DSL is compiled server-side by the Rayfin CLI.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+@role("member", ["update", "delete"], { policy: (claims: any, item: any) => claims.sub.eq(item.decided_by) })
 export class QuarantineTriage {
   /** Auto-generated primary key. */
   @field({ type: "uuid", primaryKey: true, auto: true })

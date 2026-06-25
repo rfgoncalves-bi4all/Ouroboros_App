@@ -14,11 +14,7 @@ import { QuarantineRowTable } from "./app/QuarantineRowTable";
 import { TriagePanel } from "./app/TriagePanel";
 import { DQResultsDashboard } from "./app/DQResultsDashboard";
 import { ContractViewer } from "./app/ContractViewer";
-import {
-  useTriageByRunId,
-  useEditsByRunId,
-} from "./hooks/useQuarantineState";
-import { useFabricClients } from "./hooks/useFabricClients";
+import { useTriageByRunId, useEditsByRunId } from "./hooks/useQuarantineState";
 import { useFabricAuth } from "./hooks/useFabricAuth";
 import type { QuarantineTableInfo } from "./services/quarantineService";
 
@@ -52,7 +48,6 @@ const TABS: { id: Tab; label: string }[] = [
 // ---------------------------------------------------------------------------
 
 function TriageView() {
-  const { rayfin } = useFabricClients();
   const [selectedTable, setSelectedTable] = useState<QuarantineTableInfo | null>(null);
   const [selectedRow, setSelectedRow] = useState<{
     row: Record<string, unknown>;
@@ -63,8 +58,8 @@ function TriageView() {
     ? (selectedRow.row["run_id"] as string | undefined)
     : undefined;
 
-  const triageQuery = useTriageByRunId(rayfin, activeRunId);
-  const editsQuery = useEditsByRunId(rayfin, activeRunId);
+  const triageQuery = useTriageByRunId(activeRunId);
+  const editsQuery = useEditsByRunId(activeRunId);
 
   function handleRowSelect(row: Record<string, unknown>, hash: string) {
     setSelectedRow({ row, hash });
@@ -125,7 +120,7 @@ function TriageView() {
 // ---------------------------------------------------------------------------
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useFabricAuth();
+  const { isAuthenticated, isLoading, signIn } = useFabricAuth();
 
   if (isLoading) {
     return (
@@ -147,6 +142,13 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
             Open this app from the Microsoft Fabric portal to sign in automatically,
             or start the Rayfin dev server locally.
           </p>
+          <button
+            type="button"
+            onClick={signIn}
+            className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors mb-4"
+          >
+            Sign in with Microsoft Fabric
+          </button>
           <p className="text-xs text-gray-400">
             If you are already signed in and see this screen, the Fabric session
             may have expired. Reload the page to retry.

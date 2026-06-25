@@ -7,7 +7,6 @@
  * Returns maps keyed by row_hash for O(1) overlay lookup in QuarantineRowTable.
  */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { GraphQLClient } from "graphql-request";
 import {
   listTriageByRunId,
   listEditsByRunId,
@@ -15,7 +14,6 @@ import {
   updateTriage,
   createEdit,
   type TriageRecord,
-  type EditRecord,
 } from "../services/rayfinClient";
 import type { TriageDecision } from "../models/QuarantineTriage";
 import type { EditAction } from "../models/QuarantineEdit";
@@ -32,24 +30,22 @@ const editsKey = (run_id: string) => ["edits", run_id] as const;
 // ---------------------------------------------------------------------------
 
 export function useTriageByRunId(
-  client: GraphQLClient,
   run_id: string | undefined,
 ) {
   return useQuery({
     queryKey: triageKey(run_id ?? ""),
-    queryFn: () => listTriageByRunId(client, run_id!),
+    queryFn: () => listTriageByRunId(run_id!),  
     enabled: !!run_id,
     staleTime: 30_000,
   });
 }
 
 export function useEditsByRunId(
-  client: GraphQLClient,
   run_id: string | undefined,
 ) {
   return useQuery({
     queryKey: editsKey(run_id ?? ""),
-    queryFn: () => listEditsByRunId(client, run_id!),
+    queryFn: () => listEditsByRunId(run_id!),  
     enabled: !!run_id,
     staleTime: 30_000,
   });
@@ -59,7 +55,7 @@ export function useEditsByRunId(
 // Mutations
 // ---------------------------------------------------------------------------
 
-export function useUpsertTriage(client: GraphQLClient, run_id: string) {
+export function useUpsertTriage(run_id: string) {
   const qc = useQueryClient();
 
   return useMutation({
@@ -71,12 +67,12 @@ export function useUpsertTriage(client: GraphQLClient, run_id: string) {
       notes?: string;
     }) => {
       if (args.existing) {
-        return updateTriage(client, args.existing.id, {
+        return updateTriage(args.existing.id, {
           decision: args.decision,
           notes: args.notes,
         });
       }
-      return createTriage(client, {
+      return createTriage({
         dataset: args.dataset,
         run_id,
         row_hash: args.row_hash,
@@ -90,7 +86,7 @@ export function useUpsertTriage(client: GraphQLClient, run_id: string) {
   });
 }
 
-export function useCreateEdit(client: GraphQLClient, run_id: string) {
+export function useCreateEdit(run_id: string) {
   const qc = useQueryClient();
 
   return useMutation({
@@ -101,7 +97,7 @@ export function useCreateEdit(client: GraphQLClient, run_id: string) {
       corrections?: Record<string, unknown> | null;
       notes?: string;
     }) =>
-      createEdit(client, {
+      createEdit({
         ...args,
         run_id,
       }),

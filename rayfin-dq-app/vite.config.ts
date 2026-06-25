@@ -14,9 +14,7 @@ export default defineConfig({
   },
   build: {
     target: "ES2022",
-    rollupOptions: {
-      // @rayfin/sdk is injected by the Fabric runtime at deploy time — not bundled
-      external: ["@rayfin/sdk"],
-    },
+    rollupOptions: {},
+  },
   },
 });

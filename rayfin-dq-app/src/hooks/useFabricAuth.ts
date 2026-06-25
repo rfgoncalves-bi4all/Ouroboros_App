@@ -1,63 +1,90 @@
 /**
  * useFabricAuth.ts
  *
- * Wraps the runtime-injected @rayfin/sdk useAuth() hook and exposes a
- * stable, typed interface for authentication state within the app.
- *
- * The @rayfin/sdk is injected by the Fabric runtime at deploy time and is
- * not bundled (see vite.config.ts external). When running locally the SDK
- * is provided by the Rayfin dev server via RayfinProvider.
+ * React hook that manages Fabric SSO authentication using the
+ * @microsoft/rayfin-auth-provider-fabric package.
  *
  * Auth lifecycle:
- *   1. RayfinProvider (main.tsx) initialises the session on mount.
- *      Inside the Fabric portal the SDK uses embedded-mode postMessage
- *      to acquire the token silently. Outside Fabric it may prompt sign-in.
- *   2. While the session is being acquired, accessToken is an empty string
- *      and isAuthenticated is false.
- *   3. Once the session is ready, accessToken is populated and the app
- *      renders normally.
- *
- * NOTE: Full initEmbeddedAuth / ensureSignedInWithFabric support (including
- * an explicit sign-in button for popup flow) requires migrating to the
- * @microsoft/rayfin-auth-provider-fabric package (SDK migration, Group 5).
+ *   1. On mount, calls initEmbeddedAuth() which attempts a silent sign-in via
+ *      the Fabric portal's postMessage bridge (embedded / iframe mode).
+ *      Inside the Fabric portal this succeeds silently; outside it resolves
+ *      null and the app shows a sign-in prompt.
+ *   2. session state is kept in sync via client.auth.onSessionChange().
+ *   3. signIn() calls ensureSignedInWithFabric() which opens the Fabric portal
+ *      OAuth popup flow when needed.
+ *   4. signOut() delegates to client.auth.signOut().
  */
-import { useAuth } from "@rayfin/sdk";
+import { useState, useEffect, useCallback } from "react";
+import type { OpaqueSession } from "@microsoft/rayfin-auth";
+import {
+  initEmbeddedAuth,
+  ensureSignedInWithFabric,
+  type FabricAuthOptions,
+} from "@microsoft/rayfin-auth-provider-fabric";
+import { client } from "../lib/rayfin";
 
-// The runtime SDK may expose more fields than the type stubs declare.
-// We read only the subset the app needs.
-type RuntimeAuthResult = {
-  accessToken: string;
-  userId?: string;
-  isLoading?: boolean;
-};
+function buildFabricOptions(): FabricAuthOptions {
+  return {
+    workspaceId: import.meta.env.VITE_FABRIC_WORKSPACE_ID ?? "",
+    projectId: import.meta.env.VITE_FABRIC_ITEM_ID ?? "",
+    fabricPortalUrl:
+      import.meta.env.VITE_FABRIC_PORTAL_URL ??
+      "https://app.fabric.microsoft.com",
+    returnOrigin: window.location.origin,
+  };
+}
 
 export interface FabricAuthState {
-  /** True when a valid session token is present. */
+  /** True when a valid session is present. */
   isAuthenticated: boolean;
-  /**
-   * True while the SDK is initialising the session.
-   * Derived from the absence of a token before the first render cycle
-   * where the token is expected to be populated.
-   */
+  /** True while the initial auth check is in progress. */
   isLoading: boolean;
-  /** Bearer token forwarded to Fabric SQL and Rayfin GraphQL calls. */
-  accessToken: string;
-  /** User identifier from the Rayfin session (may be undefined during init). */
+  /** Current user ID, or undefined when not signed in. */
   userId: string | undefined;
+  /** Current user email, or undefined when not signed in. */
+  email: string | undefined;
+  /** Trigger the Fabric OAuth popup flow to sign in. */
+  signIn: () => void;
+  /** Sign out and clear the session. */
+  signOut: () => void;
 }
 
 export function useFabricAuth(): FabricAuthState {
-  const auth = useAuth() as RuntimeAuthResult;
+  const [session, setSession] = useState<OpaqueSession | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const accessToken = auth.accessToken ?? "";
-  // Treat an empty token as "loading" when the SDK hasn't resolved yet.
-  const isLoading = auth.isLoading ?? accessToken === "";
-  const isAuthenticated = accessToken !== "";
+  useEffect(() => {
+    const options = buildFabricOptions();
+    const unsubscribe = client.auth.onSessionChange(setSession);
+
+    initEmbeddedAuth(client.auth, options)
+      .then((s) => {
+        if (s) setSession(s);
+      })
+      .catch(() => {
+        // Silent init failure is expected outside the Fabric portal.
+      })
+      .finally(() => setIsLoading(false));
+
+    return unsubscribe;
+  }, []);
+
+  const signIn = useCallback(() => {
+    const options = buildFabricOptions();
+    void ensureSignedInWithFabric(client.auth, options).then(setSession);
+  }, []);
+
+  const signOut = useCallback(() => {
+    void client.auth.signOut();
+  }, []);
 
   return {
-    isAuthenticated,
+    isAuthenticated: session?.isAuthenticated ?? false,
     isLoading,
-    accessToken,
-    userId: auth.userId,
+    userId: session?.user?.id ?? undefined,
+    email: session?.user?.email ?? undefined,
+    signIn,
+    signOut,
   };
 }
+

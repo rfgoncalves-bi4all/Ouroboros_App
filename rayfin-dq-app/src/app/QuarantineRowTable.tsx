@@ -71,7 +71,7 @@ interface Props {
 }
 
 export function QuarantineRowTable({ table, onRowSelect }: Props) {
-  const { projectSql, rayfin } = useFabricClients();
+  const { projectSql } = useFabricClients();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [page, setPage] = useState(0);
 
@@ -119,8 +119,8 @@ export function QuarantineRowTable({ table, onRowSelect }: Props) {
   });
 
   // Triage and edit overlays.
-  const triageQuery = useTriageByRunId(rayfin, activeRunId);
-  const editsQuery = useEditsByRunId(rayfin, activeRunId);
+  const triageQuery = useTriageByRunId(activeRunId);
+  const editsQuery = useEditsByRunId(activeRunId);
   const triageMap = triageQuery.data ?? new Map();
   const editsMap = editsQuery.data ?? new Map();
 

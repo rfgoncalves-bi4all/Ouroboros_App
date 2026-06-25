@@ -72,7 +72,7 @@ export function TriagePanel({
   existingEdits,
   onClose,
 }: Props) {
-  const { dqEngineSql, rayfin } = useFabricClients();
+  const { dqEngineSql } = useFabricClients();
   const [triageNotes, setTriageNotes] = useState(existingTriage?.notes ?? "");
   const [editNotes, setEditNotes] = useState("");
   const [corrections, setCorrections] = useState<Record<string, string>>({});
@@ -87,8 +87,8 @@ export function TriagePanel({
     staleTime: 60_000,
   });
 
-  const upsertTriage = useUpsertTriage(rayfin, run_id);
-  const createEditMutation = useCreateEdit(rayfin, run_id);
+  const upsertTriage = useUpsertTriage(run_id);
+  const createEditMutation = useCreateEdit(run_id);
 
   // Data columns only (sorted), metadata pinned separately.
   const dataColumns = Object.keys(row)

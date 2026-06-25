@@ -1,0 +1,29 @@
+id: rayfin-dq-app
+name: rayfin-dq-app
+version: 0.1.0
+
+services:
+  auth:
+    enabled: true
+    expiryInMinutes: 60
+    refreshToken:
+      lifetimeInDays: 30
+    allowedRedirectUris:
+      - http://localhost:3000
+    fabric:
+      enabled: true
+
+  data:
+    enabled: true
+    dialect: mssql
+
+  staticHosting:
+    enabled: true
+    root: .
+    folder: dist
+    buildCommand: npm run build
+    indexDocument: index.html
+
+roles:
+  - name: member
+  - name: viewer

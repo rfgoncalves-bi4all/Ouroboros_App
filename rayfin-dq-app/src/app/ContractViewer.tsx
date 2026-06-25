@@ -18,7 +18,7 @@
  */
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@rayfin/sdk";
+import { getSessionAccessToken } from "../lib/rayfin";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -79,7 +79,7 @@ async function fetchContractContent(
 // ---------------------------------------------------------------------------
 
 export function ContractViewer() {
-  const { accessToken } = useAuth();
+  const accessToken = getSessionAccessToken();
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   const {

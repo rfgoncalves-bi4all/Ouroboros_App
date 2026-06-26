@@ -23,6 +23,7 @@ import { useFabricClients } from "../hooks/useFabricClients";
 import { TriageDecision } from "../models/QuarantineTriage";
 import { EditStatus } from "../models/QuarantineEdit";
 import type { QuarantineTableInfo } from "../services/quarantineService";
+import type { TriageRecord, EditRecord } from "../services/rayfinClient";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -121,8 +122,8 @@ export function QuarantineRowTable({ table, onRowSelect }: Props) {
   // Triage and edit overlays.
   const triageQuery = useTriageByRunId(activeRunId);
   const editsQuery = useEditsByRunId(activeRunId);
-  const triageMap = triageQuery.data ?? new Map();
-  const editsMap = editsQuery.data ?? new Map();
+  const triageMap = triageQuery.data ?? new Map<string, TriageRecord>();
+  const editsMap = editsQuery.data ?? new Map<string, EditRecord[]>();
 
   // Row hashes (computed async, stored in state).
   const [rowHashes, setRowHashes] = useState<string[]>([]);

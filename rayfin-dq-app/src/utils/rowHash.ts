@@ -42,7 +42,7 @@ export async function computeRowHash(
   // Sort keys alphabetically, excluding metadata columns.
   const keys = Object.keys(row)
     .filter((k) => !METADATA_COLUMNS.has(k))
-    .sort((a, b) => a.localeCompare("en"));  // locale-independent alphabetical
+    .sort((a, b) => a.localeCompare(b));  // locale-independent alphabetical
 
   const payload = keys
     .map((k) => {

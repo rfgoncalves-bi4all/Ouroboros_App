@@ -16,5 +16,4 @@ export default defineConfig({
     target: "ES2022",
     rollupOptions: {},
   },
-  },
 });

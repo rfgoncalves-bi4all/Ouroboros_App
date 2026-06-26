@@ -1,7 +1,6 @@
 id: rayfin-dq-app
 name: rayfin-dq-app
 version: 0.1.0
-
 services:
   auth:
     enabled: true
@@ -10,20 +9,22 @@ services:
       lifetimeInDays: 30
     allowedRedirectUris:
       - http://localhost:3000
+      - https://dual-drift-0fef9cb648-swedencentral.webapp.fabricapps.net
     fabric:
       enabled: true
-
   data:
     enabled: true
     dialect: mssql
-
   staticHosting:
     enabled: true
     root: .
     folder: dist
     buildCommand: npm run build
     indexDocument: index.html
-
+  storage:
+    enabled: false
+  functions:
+    enabled: false
 roles:
   - name: member
   - name: viewer

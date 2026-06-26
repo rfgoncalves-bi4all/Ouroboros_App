@@ -1,0 +1,15 @@
+{
+  "deployments": {
+    "rfgdq-workspace": {
+      "fabricItemId": "a8e70e83-6fa9-4063-ae36-bd8f4d350e9d",
+      "fabricApiUrl": "https://afbb53027aee488db2399c362a5747ef.pbidedicated.windows.net/webapi/capacities/afbb5302-7aee-488d-b239-9c362a5747ef/workloads/BaaS/BaaSService/automatic/v1/workspaces/a6b192ec-3517-458e-a091-19c72a9d6992/appbackends/a8e70e83-6fa9-4063-ae36-bd8f4d350e9d/",
+      "fabricWorkspaceId": "a6b192ec-3517-458e-a091-19c72a9d6992",
+      "fabricTenantId": "41bcb72d-c1e9-42e2-b451-eaded8635d70",
+      "publishableKey": "pk-H3oW8Y5Oc-zy99ZT1CQk",
+      "hostingUrl": "https://dual-drift-0fef9cb648-swedencentral.webapp.fabricapps.net",
+      "fabricDeepLink": "https://app.fabric.microsoft.com/groups/a6b192ec-3517-458e-a091-19c72a9d6992/appbackends/a8e70e83-6fa9-4063-ae36-bd8f4d350e9d?ctid=41bcb72d-c1e9-42e2-b451-eaded8635d70",
+      "deployedAt": "2026-06-26T10:21:50.666Z"
+    }
+  },
+  "active": "rfgdq-workspace"
+}
